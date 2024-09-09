@@ -1,0 +1,175 @@
+{% extends "layouts/main.html" %}
+
+{% block pageTitle %}
+    What is your return address for courier? - Return equipment - {{ serviceName }} - GOV.UK
+{% endblock %}
+
+{% block beforeContent %}
+    <a href="#" class="govuk-back-link" onClick="window.history.back()">Back</a>
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">Enter your pickup address</h1>
+
+            <div class="govuk-error-summary error-summary" id="error-summary" style="display:none;">
+                <h2 class="govuk-error-summary__title">There is a problem</h2>
+                <ul class="govuk-list govuk-error-summary__list" id="error-list"></ul>
+            </div>
+
+            <form id="myForm" novalidate>
+                <div class="govuk-form-group" id="input1-group">
+                    <label class="govuk-label" for="input1">Address line 1</label>
+                    <span class="govuk-error-message" id="input1-error" style="display:none;">Enter address line 1, typically the building and street</span>
+                    <input class="govuk-input" id="input1" name="input1" type="text" />
+                </div>
+
+                <div class="govuk-form-group" id="input4-group">
+                    <label class="govuk-label" for="input4">Address line 2 (optional)</label>
+                    <input class="govuk-input" id="input4" name="input4" type="text" />
+                </div>
+
+                <div class="govuk-form-group" id="input2-group">
+                    <label class="govuk-label" for="input2">Town or city</label>
+                    <span class="govuk-error-message" id="input2-error" style="display:none;">Enter your town or city</span>
+                    <input class="govuk-input" id="input2" name="input2" type="text" />
+                </div>
+
+                <div class="govuk-form-group" id="input3-group">
+                    <label class="govuk-label" for="input3">Postcode</label>
+                    <span class="govuk-error-message" id="input3-error" style="display:none;">Enter your postcode</span>
+                    <input class="govuk-input" id="input3" name="input3" type="text" />
+                </div>
+
+                <button type="button" data-module="govuk-button" class="govuk-button" id="submitButton">Continue</button>
+
+            </form>
+
+            {% include "includes/details-not-finished.html" %}
+        </div>
+    </div>
+
+    <script>
+        // Populate fields if editing
+        function populateFields() {
+            const answers = JSON.parse(localStorage.getItem('formAnswers'));
+            if (answers) {
+                document
+                    .getElementById('input1')
+                    .value = answers.input1 || '';
+                document
+                    .getElementById('input2')
+                    .value = answers.input2 || '';
+                document
+                    .getElementById('input3')
+                    .value = answers.input3 || '';
+                document
+                    .getElementById('input4')
+                    .value = answers.input4 || '';
+            }
+        }
+
+        document
+            .getElementById('submitButton')
+            .addEventListener('click', function () {
+                
+
+                // Hide error summary and messages initially
+                document
+                    .getElementById('error-summary')
+                    .style
+                    .display = 'none';
+                const errorList = document.getElementById('error-list');
+                errorList.innerHTML = '';
+                let hasError = false;
+
+                // Required fields
+                const requiredFields = [
+                    {
+                        id: 'input1',
+                        errorId: 'input1-error'
+                    }, {
+                        id: 'input2',
+                        errorId: 'input2-error'
+                    }, {
+                        id: 'input3',
+                        errorId: 'input3-error'
+                    }
+                ];
+
+                // Validation
+                requiredFields.forEach(field => {
+                    const input = document.getElementById(field.id);
+                    const errorMessage = document.getElementById(field.errorId);
+                    const pageTitle = document.title;
+
+                    if (!input.value.trim()) {
+                        hasError = true;
+                        input
+                            .classList
+                            .add('govuk-input--error');
+                        input
+                            .parentElement
+                            .classList
+                            .add('govuk-form-group--error');
+                        //errorMessage.textContent = 'This field is required';
+                        errorMessage.style.display = 'block';
+
+                        // Add 'Error: ' at start of title for screen readers
+                        document.title = 'Error: ' + pageTitle;
+
+                        // Add error message to the error summary
+                        const errorItem = document.createElement('li');
+                        errorItem.innerHTML = `<a href="#${field.id}">${input.previousElementSibling.innerText}</a>`;
+                        errorList.appendChild(errorItem);
+                    } else {
+                        input
+                            .classList
+                            .remove('govuk-input--error');
+                        input
+                            .parentElement
+                            .classList
+                            .remove('govuk-form-group--error');
+                        errorMessage.style.display = 'none';
+
+                        // Remove 'Error: ' from start of page title
+                        document.title = pageTitle;
+                    }
+                });
+
+                // If there are errors, show the error summary
+                if (hasError) {
+                    document
+                        .getElementById('error-summary')
+                        .style
+                        .display = 'block';
+                } else {
+                    // Store answers in local storage
+                    const answers = {
+                        input1: document
+                            .getElementById('input1')
+                            .value,
+                        input2: document
+                            .getElementById('input2')
+                            .value,
+                        input3: document
+                            .getElementById('input3')
+                            .value,
+                        input4: document
+                            .getElementById('input4')
+                            .value
+                    };
+                    localStorage.setItem('formAnswers', JSON.stringify(answers));
+                    // Redirect to the summary page
+                    window.location.href = 'summary.html';
+                }
+            });
+
+        // Populate fields when the page loads
+        window.onload = function () {
+            populateFields();
+        };
+    </script>
+
+{% endblock %}

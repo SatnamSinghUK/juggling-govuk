@@ -1,0 +1,124 @@
+{% extends "layouts/main.html" %}
+
+{% block pageTitle %}
+    How do you want to return your equipment? - Return equipment - {{ serviceName }} - GOV.UK
+{% endblock %}
+
+{% block beforeContent %}
+    <a href="#" class="govuk-back-link" onClick="window.history.back()">Back</a>
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-error-summary error-summary" id="error-summary" style="display:none;" data-module="govuk-error-summary">
+                <div role="alert">
+                    <h2 class="govuk-error-summary__title">
+                There is a problem
+                </h2>
+                    <div class="govuk-list govuk-error-summary__list">
+                        <ul class="govuk-list govuk-error-summary__list" id="error-list"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <form id="initialForm" novalidate>
+                <div class="govuk-form-group" id="radio1-group">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                            <h1 class="govuk-fieldset__heading">
+                            How do you want to return your juggling equipment?
+                            </h1>
+                        </legend>
+                        <span class="govuk-error-message" id="radio-error" style="display:none;"></span>
+                        <div class="govuk-radios" data-module="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="option1" name="radioOptions" type="radio" value="option1" />
+                                <label class="govuk-label govuk-radios__label" for="option1">By courier</label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="option2" name="radioOptions" type="radio" value="option2" />
+                                <label class="govuk-label govuk-radios__label" for="option2">In person</label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <button type="button" data-module="govuk-button" class="govuk-button" id="continueButton">Continue</button>
+            </form>
+
+            {% include "includes/details-not-finished.html" %}
+
+        </div>
+    </div>
+
+    <script>
+        document
+            .getElementById('continueButton')
+            .addEventListener('click', function () {
+                const selectedOption = document.querySelector('input[name="radioOptions"]:checked');
+                const errorMessage = document.getElementById('radio-error');
+                const errorList = document.getElementById('error-list');
+                const radio1 = document.getElementById('radio1-group');
+                const pageTitle = document.title;
+
+                errorList.innerHTML = ''; // Clear previous errors
+                document
+                    .getElementById('error-summary')
+                    .style
+                    .display = 'none'; // Hide error summary initially
+
+                // Reset error message
+                errorMessage.style.display = 'none';
+                radio1
+                    .classList
+                    .remove('govuk-form-group--error');
+
+                // Remove 'Error: ' from start of page title
+                document.title = pageTitle;    
+
+                if (!selectedOption) {
+                    errorMessage.textContent = 'Select a return option';
+                    errorMessage.style.display = 'block';
+                    radio1
+                        .classList
+                        .add('govuk-form-group--error');
+
+                    // Add 'Error: ' at start of title for screen readers
+                    document.title = 'Error: ' + pageTitle;
+
+                    // Add error message to summary
+                    const errorItem = document.createElement('li');
+                    errorItem.innerHTML = `<a href="#radio1-group">Select a return option</a>`;
+                    errorList.appendChild(errorItem);
+                    document
+                        .getElementById('error-summary')
+                        .style
+                        .display = 'block'; // Show error summary
+                    return;
+                }
+
+                // Store the selected option in local storage
+                localStorage.setItem('formOption', selectedOption.value);
+
+                // Redirect based on selection
+                if (selectedOption.value === 'option1') {
+                    window.location.href = 'return-address.html'; // Redirect to existing form
+                } else {
+                    window.location.href = 'return-office.html'; // Redirect to new form
+                }
+            });
+
+        // Populate radio buttons if values are present in localStorage
+        window.onload = function () {
+            const storedOption = localStorage.getItem('formOption');
+            if (storedOption) {
+                const radioButton = document.querySelector(`input[type='radio'][value='${storedOption}']`);
+                if (radioButton) {
+                    radioButton.checked = true; // Check the stored radio option
+                }
+            }
+        };
+    </script>
+
+{% endblock %}

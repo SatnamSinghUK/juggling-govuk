@@ -1,0 +1,126 @@
+{% extends "layouts/main.html" %}
+
+{% block pageTitle %}
+    Which office do you want to return to? - Return equipment - {{ serviceName }} - GOV.UK
+{% endblock %}
+
+{% block beforeContent %}
+    <a href="#" class="govuk-back-link" onClick="window.history.back()">Back</a>
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-error-summary error-summary" id="error-summary" style="display:none;">
+                <h2 class="govuk-error-summary__title">There is a problem</h2>
+                <ul class="govuk-list govuk-error-summary__list" id="error-list"></ul>
+            </div>
+
+            <form id="newForm" novalidate>
+                <div class="govuk-form-group" id="newRadio1-group">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                            <h1 class="govuk-fieldset__heading">
+                            Select your return location
+                            </h1>
+                        </legend>
+                        <span class="govuk-error-message" id="newRadio-error" style="display:none;"></span>
+
+                        <div class="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="newOption1" name="newRadioOptions" type="radio" value="Northern office" />
+                                <label class="govuk-label govuk-radios__label" for="newOption1">Northern office</label>
+                                <div class="govuk-hint govuk-radios__hint">
+                                1 North Street, NN1 001
+                                </div>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="newOption2" name="newRadioOptions" type="radio" value="Southern office" />
+                                <label class="govuk-label govuk-radios__label" for="newOption2">Southern office</label>
+                                <div class="govuk-hint govuk-radios__hint">
+                                1 South Street, SS1 001
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <button type="button" data-module="govuk-button" class="govuk-button" id="newContinueButton">Continue</button>
+
+            </form>
+
+            {% include "includes/details-not-finished.html" %}
+
+        </div>
+    </div>
+
+    <script>
+        document
+            .getElementById('newContinueButton')
+            .addEventListener('click', function () {
+                const newSelectedOption = document.querySelector('input[name="newRadioOptions"]:checked');
+                const newErrorMessage = document.getElementById('newRadio-error');
+                const errorList = document.getElementById('error-list');
+                const radio1 = document.getElementById('newRadio1-group');
+                const pageTitle = document.title;
+
+                errorList.innerHTML = ''; // Clear previous errors
+                document
+                    .getElementById('error-summary')
+                    .style
+                    .display = 'none'; // Hide error summary initially    
+
+                // Reset error message
+                newErrorMessage.style.display = 'none';
+                radio1
+                    .classList
+                    .remove('govuk-form-group--error');
+
+                // Remove 'Error: ' from start of page title
+                document.title = pageTitle;     
+
+                if (!newSelectedOption) {
+                    newErrorMessage.textContent = 'Select a return location';
+                    newErrorMessage.style.display = 'block';
+                    radio1
+                        .classList
+                        .add('govuk-form-group--error');
+
+                    // Add 'Error: ' at start of title for screen readers
+                    document.title = 'Error: ' + pageTitle;    
+
+                    // Add error message to the error summary
+                    const errorItem = document.createElement('li');
+                    errorItem.innerHTML = `<a href="#newRadio1-group">Select a return location</a>`;
+                    errorList.appendChild(errorItem);
+                    document
+                        .getElementById('error-summary')
+                        .style
+                        .display = 'block'; // Show error summary
+                    return; // Stop execution if no selection is made
+                }
+
+                // Set office address to show in summary
+                let officeAddress = newSelectedOption.value === 'Northern office' ? `<br> 1 North Street, NN1 001` : `<br> 1 South Street, SS1 001`;
+                localStorage.setItem('officeAddress', officeAddress);
+
+                // Store the selected option in local storage
+                localStorage.setItem('newFormOption', newSelectedOption.value);
+
+                // Redirect to the confirmation page
+                window.location.href = 'summary.html';
+            });
+
+        // Populate radio buttons if values are present in localStorage on load
+        window.onload = function () {
+            const storedNewOption = localStorage.getItem('newFormOption');
+            if (storedNewOption) {
+                const radioButton = document.querySelector(`input[type='radio'][value='${storedNewOption}']`);
+                if (radioButton) {
+                    radioButton.checked = true; // Check the stored radio option
+                }
+            }
+        };
+    </script>
+
+{% endblock %}

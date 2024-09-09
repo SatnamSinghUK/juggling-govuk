@@ -1,0 +1,127 @@
+{% extends "layouts/main.html" %}
+
+{% block pageTitle %}
+    Your juggling equipment return summary - Return equipment - {{ serviceName }} - GOV.UK
+{% endblock %}
+
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% block content %}
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            {{ govukPanel({
+                titleText: "Your juggling equipment return request has been received",
+                html: "Your reference number<br><strong>JUGGLING2123F</strong> "
+            }) }}
+
+            <h2 class="govuk-heading-m">Details entered</h2>
+
+            <dl class="govuk-summary-list" id="confirmation"></dl>
+
+            <h2 class="govuk-heading-m">What happens next</h2>
+            <p class="govuk-body">We have sent you a confirmation email.</p>
+
+            <p class="govuk-body">
+                We’ve sent your return request to the Juggling Office.
+            </p>
+            <p class="govuk-body">
+                They will contact you either to confirm your request, or to ask for more information.
+            </p>
+
+            <a href="/" role="button" draggable="false" class="govuk-button" data-module="govuk-button" onclick="localStorage.clear();">
+                Start new return request
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Load answers from local storage
+        window.onload = function () {
+            const answers = JSON.parse(localStorage.getItem('formAnswers'));
+            const formOption = localStorage.getItem('formOption'); // Get the selected radio option from the initial page
+            const newFormOption = localStorage.getItem('newFormOption'); // Get the selected option from the new form
+            const officeAddress = localStorage.getItem('officeAddress'); // Get office address
+            const confirmationDiv = document.getElementById('confirmation');
+
+            confirmationDiv.innerHTML += `
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Return option
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <p class="govuk-body">${formOption === 'option1'
+                                ? 'By courier'
+                                : 'In person'}
+                        </p>
+                    </dd>
+                </div>
+            `;
+
+            // Only show inputs from the associated form
+            if (formOption === 'option1') {
+                confirmationDiv.innerHTML += `
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Address line 1
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <p class="govuk-body">${answers
+                    ? answers.input1 || ''
+                    : ''}
+                        </p>
+                    </dd>
+                </div>
+
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Address line 2
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <p class="govuk-body">${answers
+                    ? answers.input4 || ''
+                    : ''}
+                        </p>
+                    </dd>
+                </div>
+
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Town or city
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <p class="govuk-body">${answers
+                    ? answers.input2 || ''
+                    : ''}
+                        </p>
+                    </dd>
+                </div>
+
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Postcode
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        <p class="govuk-body">${answers
+                    ? answers.input3 || ''
+                    : ''}
+                        </p>
+                    </dd>
+                </div>
+                `;
+            } else if (formOption === 'option2') {
+                confirmationDiv.innerHTML += `
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Return location
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            <p class="govuk-body">${newFormOption || ''} ${officeAddress || ''}</p>
+                        </dd>
+                    </div>
+                `;
+            }
+        };
+    </script>
+
+{% endblock %}

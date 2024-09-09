@@ -1,0 +1,131 @@
+{% extends "layouts/main.html" %}
+
+{% block pageTitle %}
+    Check your answers - Return equipment - {{ serviceName }} - GOV.UK
+{% endblock %}
+
+{% block beforeContent %}
+    <a href="#" class="govuk-back-link" onClick="window.history.back()">Back</a>
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">Check your answers</h1>
+
+            <dl id="summary" class="govuk-summary-list"></dl>
+            <a href="confirmation.html" class="govuk-button">Submit answers</a>
+
+            {% include "includes/details-not-finished.html" %}
+
+            <script>
+                // Load answers from local storage
+                window.onload = function () {
+                    const answers = JSON.parse(localStorage.getItem('formAnswers'));
+                    const formOption = localStorage.getItem('formOption'); // Get the selected radio option from the initial page
+                    const newFormOption = localStorage.getItem('newFormOption'); // Get the selected radio option from the new form
+                    const officeAddress = localStorage.getItem('officeAddress'); // Get office address
+
+                    const confirmationDiv = document.getElementById('summary');
+                    confirmationDiv.innerHTML = '';
+
+                    confirmationDiv.innerHTML += `
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Return option
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            ${formOption === 'option1'
+                        ? 'By courier'
+                        : 'In person'}
+                        </dd>
+                        <dd class="govuk-summary-list__actions">
+                            <a class="govuk-link" href="return-option.html">Change<span class="govuk-visually-hidden"> name</span></a>
+                        </dd>
+                    </div>
+                `;
+
+                    // Show inputs from the associated form in a single list
+                    if (formOption === 'option1') {
+                        confirmationDiv.innerHTML += `
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Address line 1
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                ${answers
+                            ? answers.input1 || ''
+                            : ''}
+                            </dd>
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link" href="return-address.html#input1">Change<span class="govuk-visually-hidden"> name</span></a>
+                            </dd>
+                        </div>
+
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Address line 2
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                ${answers
+                                ? answers.input4 || ''
+                                : ''}
+                            </dd>
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link" href="return-address.html#input4">Change<span class="govuk-visually-hidden"> name</span></a>
+                            </dd>
+                        </div>
+
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Town or city
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                ${answers
+                                    ? answers.input2 || ''
+                                    : ''}
+                            </dd>
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link" href="return-address.html#input2">Change<span class="govuk-visually-hidden"> name</span></a>
+                            </dd>
+                        </div>
+
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Postcode
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                ${answers
+                                        ? answers.input3 || ''
+                                        : ''}
+                            </dd>
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link" href="return-address.html#input3">Change<span class="govuk-visually-hidden"> name</span></a>
+                            </dd>
+                        </div>
+
+                        
+                    `;
+                    } else if (formOption === 'option2') {
+                        confirmationDiv.innerHTML += `
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Return location
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                ${newFormOption || ''} ${officeAddress}
+                                
+                            </dd>
+                            <dd class="govuk-summary-list__actions">
+                                <a class="govuk-link" href="return-office.html">Change<span class="govuk-visually-hidden"> name</span></a>
+                            </dd>
+                        </div>
+                    `;
+                    }
+                };
+            </script>
+
+        </div>
+    </div>
+
+{% endblock %}
